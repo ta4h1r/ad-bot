@@ -1,0 +1,11 @@
+bin/
+include/
+lib/ 
+lib64/
+share/
+
+geckodriver
+geckodriver-v0.29.0-linux64.tar.gz
+
+geckodriver.log
+pyvenv.cfg
