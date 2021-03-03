@@ -29,7 +29,7 @@ def main():
     )
 
     # Open web-page, wait @timeout seconds for the profile avatar to load
-    browser.get("https://www.google.com/search?q=robots+south+africa")
+    browser.get("https://www.google.com/search?q=robots+south+africa+robotics+hardware+agnostic+sofware+fleet+management")
     timeout = 20
     try:
         WebDriverWait(browser, timeout).until(
@@ -52,7 +52,7 @@ def main():
     top_ads_text = [x.text for x in top_ads_objects]
     top_ads_tuple = zip(top_ads_text, top_ads_objects)
 
-    sites_to_click = ["www.questekdigital.co.za/robots/in_hotels"]
+    sites_to_click = ["www.questekdigital.co.za/robots/in_hotels", "www.ctrlrobotics.com"]
     for text, obj in top_ads_tuple:
         print("Found ad: ", text)
         if text in sites_to_click:
