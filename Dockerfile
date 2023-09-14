@@ -41,4 +41,4 @@ RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 
-CMD ["python", "ad_bot.py"]
+CMD ["python", "qualio_bot.py"]
