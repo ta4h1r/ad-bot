@@ -25,7 +25,7 @@ def main():
     chrome_options = set_chrome_options()
 
     browser = webdriver.Chrome(
-        executable_path="/Users/taahir.bhaiyat/Desktop/selenium-example/chromedriver-mac-arm64/chromedriver",
+        executable_path="./chromedriver-mac-arm64/chromedriver",
         options=chrome_options
     )
 
@@ -211,7 +211,7 @@ def set_chrome_options() -> None:
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
 
-    chrome_options.binary_location = "/Users/taahir.bhaiyat/Desktop/selenium-example/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing"
+    chrome_options.binary_location = "./chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing"
 
     chrome_prefs = {}
     chrome_options.experimental_options["prefs"] = chrome_prefs

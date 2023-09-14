@@ -10,4 +10,4 @@ geckodriver-v0.29.0-linux64.tar.gz
 geckodriver.log
 pyvenv.cfg
 
-*-arm64
+*-arm64*
