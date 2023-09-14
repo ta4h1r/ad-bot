@@ -43,12 +43,26 @@ def wait_for_element_visible(identifier_method, identifier_string):
         browser.quit()
 
 def set_page_limit_to_hundred(): 
-    wait_for_element_visible(By.CSS_SELECTOR, ".inline-block-right .btn.btn-default.dropdown-toggle") 
-    dropDown = browser.find_element(By.CSS_SELECTOR, ".inline-block-right .btn.btn-default.dropdown-toggle")
+    cssSelector =  '.inline-block-right .btn.btn-default.dropdown-toggle'
+    wait_for_element_visible(By.CSS_SELECTOR, cssSelector) 
+    dropDown = browser.find_element(By.CSS_SELECTOR, cssSelector)
     dropDown.click()
-    wait_for_element_visible(By.CSS_SELECTOR, '.inline-block-right li a.text-left.ng-binding')
-    dropDownItems = browser.find_elements(By.CSS_SELECTOR, '.inline-block-right li a.text-left.ng-binding')
+    cssSelector = '.inline-block-right li a.text-left.ng-binding'
+    wait_for_element_visible(By.CSS_SELECTOR, cssSelector)
+    dropDownItems = browser.find_elements(By.CSS_SELECTOR, cssSelector)
     dropDownItems[3].click()
+    time.sleep(1)
+
+def choose_only_training(): 
+    xPath = '//*[@id="contentView"]/div/div[2]/div/div[2]/button/span[2]'
+    wait_for_element_visible(By.XPATH, xPath) 
+    dropDown = browser.find_element(By.XPATH, xPath)
+    dropDown.click()
+    xPath = '//*[@id="contentView"]/div/div[2]/div/div[2]/ul/li[2]/a[1]'
+    wait_for_element_visible(By.XPATH, xPath)
+    dropDownItems = browser.find_elements(By.XPATH, xPath)
+    dropDownItems[2].click()
+    time.sleep(2)
 
 
 def input_login_details(): 
@@ -86,10 +100,15 @@ def main():
 
     set_page_limit_to_hundred()
 
-    tableRows = browser.find_elements(By.CSS_SELECTOR, '.ng-scope.navigable')
+    count = 0
+    try: 
+        tableRows = browser.find_elements(By.CSS_SELECTOR, '.ng-scope.navigable')
+        count = len(tableRows)
+    except MaxRetryError: 
+        return; 
 
-    for i in range(1, len(tableRows)): 
-        trClickable = browser.find_element(By.XPATH,  '//*[@id="contentView"]/div/table/tbody/tr[' + str(i) + ']/td[2]')
+    while (count > 0): 
+        trClickable = browser.find_element(By.XPATH,  '//*[@id="contentView"]/div/table/tbody/tr[1]/td[2]')
         trClickable.click()
 
         # Look for complete button, go back if not found 
@@ -105,6 +124,9 @@ def main():
             print("Caught waiting for complete button")
             browser.back()
             wait_for_element_visible(By.CSS_SELECTOR, '.ng-scope.navigable')
+            choose_only_training()
+            tableRows = browser.find_elements(By.CSS_SELECTOR, '.ng-scope.navigable')
+            count = len(tableRows)
             continue
 
         # Click complete button 
@@ -136,6 +158,16 @@ def main():
         wait_for_element_visible(By.CSS_SELECTOR, '.ng-scope.navigable')
 
         set_page_limit_to_hundred()
+
+        tableRows = browser.find_elements(By.CSS_SELECTOR, '.ng-scope.navigable')
+
+        count = len(tableRows)
+
+        try: 
+            tableRows = browser.find_elements(By.CSS_SELECTOR, '.ng-scope.navigable')
+            count = len(tableRows)
+        except MaxRetryError:
+            break
 
     browser.quit()
     print("Quit")
