@@ -12,32 +12,29 @@ import time
 
 from selenium.webdriver.chrome.options import Options
 
-EMAIL_ADDRESS = "taahir.bhaiyat@camcog.com"
-PASSWORD = "#X6eCGVAQKnya*b"
-def main():
+def set_chrome_options() -> None:
+    """Sets chrome options for Selenium.
+    Chrome options for headless browser is enabled.
+    """
+    chrome_options = Options()
+    # chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
 
-    # Define browser objects
-    # option = webdriver.ChromeOptions()
-    # option.add_argument("--incognito")
-    # option.add_argument("--headless") 
-    # option.add_argument("--browser.chrome.path=/Users/taahir.bhaiyat/Desktop/selenium-example/chrome-mac-arm64/Google Chrome for Testing.app")
+    chrome_options.binary_location = "./chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing"
 
-    chrome_options = set_chrome_options()
+    chrome_prefs = {}
+    chrome_options.experimental_options["prefs"] = chrome_prefs
+    chrome_prefs["profile.default_content_settings"] = {"images": 2}
+    return chrome_options
 
-    browser = webdriver.Chrome(
-        executable_path="./chromedriver-mac-arm64/chromedriver",
-        options=chrome_options
-    )
 
-    # Open web-page, wait @timeout seconds for the profile avatar to load
-    browser.get("https://app.qualio.com/library?filter=training&page=1&count=100")
-    timeout = 20
-
+def wait_for_element_visible(identifier_method, identifier_string): 
     try:
         WebDriverWait(browser, timeout).until(
             EC.visibility_of_element_located(
                 (
-                    By.XPATH, "//button[@id='login-btn']"
+                   identifier_method, identifier_string
                 )
             )
         )
@@ -45,49 +42,49 @@ def main():
         print("Timed out waiting for page to load")
         browser.quit()
 
-    """
-     LOGIN
-    """
+def set_page_limit_to_hundred(): 
+    wait_for_element_visible(By.CSS_SELECTOR, ".inline-block-right .btn.btn-default.dropdown-toggle") 
+    dropDown = browser.find_element(By.CSS_SELECTOR, ".inline-block-right .btn.btn-default.dropdown-toggle")
+    dropDown.click()
+    wait_for_element_visible(By.CSS_SELECTOR, '.inline-block-right li a.text-left.ng-binding')
+    dropDownItems = browser.find_elements(By.CSS_SELECTOR, '.inline-block-right li a.text-left.ng-binding')
+    dropDownItems[3].click()
 
+
+def input_login_details(): 
     email = browser.find_element(By.ID, "input-email")
     email.send_keys(EMAIL_ADDRESS)
- 
     password = browser.find_element(By.ID, "input-password")
     password.send_keys(PASSWORD)
 
+
+def login(): 
+    input_login_details()
     loginBtn = browser.find_element(By.ID, "login-btn")
     loginBtn.click()
 
-    try:
-        WebDriverWait(browser, timeout).until(
-            EC.visibility_of_element_located(
-                (
-                    By.CSS_SELECTOR, ".inline-block-right .btn.btn-default.dropdown-toggle"
-                )
-            )
-        )
-    except TimeoutException:
-        print("Timed out waiting for page to load")
-        browser.quit()
-    
 
-    dropDown = browser.find_element(By.CSS_SELECTOR, ".inline-block-right .btn.btn-default.dropdown-toggle")
-    dropDown.click()
+EMAIL_ADDRESS = ""
+PASSWORD = ""
 
-    try:
-        WebDriverWait(browser, timeout).until(
-            EC.visibility_of_element_located(
-                (
-                    By.CSS_SELECTOR, '.inline-block-right li a.text-left.ng-binding'
-                )
-            )
-        )
-    except TimeoutException:
-        print("Timed out waiting for page to load")
-        browser.quit()
+chrome_options = set_chrome_options()
+browser = webdriver.Chrome(
+    executable_path="./chromedriver-mac-arm64/chromedriver",
+    options=chrome_options
+)
+timeout = 20
 
-    dropDownItems = browser.find_elements(By.CSS_SELECTOR, '.inline-block-right li a.text-left.ng-binding')
-    dropDownItems[3].click()
+
+def main():
+
+    # Open web-page
+    browser.get("https://app.qualio.com/library?filter=training&page=1&count=100")
+
+    wait_for_element_visible(By.XPATH, "//button[@id='login-btn']")
+
+    login()
+
+    set_page_limit_to_hundred()
 
     tableRows = browser.find_elements(By.CSS_SELECTOR, '.ng-scope.navigable')
 
@@ -107,17 +104,7 @@ def main():
         except TimeoutException:
             print("Caught waiting for complete button")
             browser.back()
-            try: 
-                WebDriverWait(browser, 10).until(
-                    EC.visibility_of_element_located(
-                        (
-                            By.CSS_SELECTOR, '.ng-scope.navigable'
-                        )
-                    )
-                )
-            except: 
-                print("Something went wrong looking for table 1")
-                browser.quit()
+            wait_for_element_visible(By.CSS_SELECTOR, '.ng-scope.navigable')
             continue
 
         # Click complete button 
@@ -137,86 +124,21 @@ def main():
             print("Caught waiting for sign off")
             browser.back()
             browser.back()
-            try: 
-                WebDriverWait(browser, 10).until(
-                    EC.visibility_of_element_located(
-                        (
-                            By.CSS_SELECTOR, '.ng-scope.navigable'
-                        )
-                    )
-                )
-            except: 
-                print("Something went wrong looking for table 2")
-                browser.quit()
+            wait_for_element_visible(By.CSS_SELECTOR, '.ng-scope.navigable')
         
 
-        # Fill in your details 
-        email = browser.find_element(By.ID, "input-email")
-        email.send_keys(EMAIL_ADDRESS)
-    
-        password = browser.find_element(By.ID, "input-password")
-        password.send_keys(PASSWORD)
+        input_login_details()
 
         # Click sign-off button
         signoffBtn = browser.find_element (By.XPATH, '//*[@id="ng-app"]/body/div[1]/span/div/div[2]/div/div/div[2]/form/div[2]/button[1]')
         signoffBtn.click()
 
-        try: 
-            WebDriverWait(browser, 10).until(
-                EC.visibility_of_element_located(
-                    (
-                        By.CSS_SELECTOR, '.ng-scope.navigable'
-                    )
-                )
-            )
-        except: 
-            print("Something went wrong")
-            browser.quit()
+        wait_for_element_visible(By.CSS_SELECTOR, '.ng-scope.navigable')
+
+        set_page_limit_to_hundred()
 
     browser.quit()
     print("Quit")
-
-
-def scroll_shim(passed_in_driver, browser_obj):
-    """
-    Brings a specified browser_obj into the page viewport so that it can be clicked 
-
-    :param passed_in_driver:
-    :param browser_obj:
-    :return:
-    """
-    x = browser_obj.location['x']
-    y = browser_obj.location['y']
-    scroll_by_coord = 'window.scrollTo(%s,%s);' % (
-        x,
-        y
-    )
-    scroll_nav_out_of_way = 'window.scrollBy(0, -120);'
-    passed_in_driver.execute_script(scroll_by_coord)
-    passed_in_driver.execute_script(scroll_nav_out_of_way)
-
-
-def open_in_new_tab(passed_in_driver, browser_obj):
-    scroll_shim(passed_in_driver, browser_obj)
-    ActionChains(passed_in_driver).key_down(Keys.CONTROL).click(browser_obj).perform()
-    time.sleep(5)
-
-
-def set_chrome_options() -> None:
-    """Sets chrome options for Selenium.
-    Chrome options for headless browser is enabled.
-    """
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-
-    chrome_options.binary_location = "./chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing"
-
-    chrome_prefs = {}
-    chrome_options.experimental_options["prefs"] = chrome_prefs
-    chrome_prefs["profile.default_content_settings"] = {"images": 2}
-    return chrome_options
 
 
 if __name__ == "__main__":
